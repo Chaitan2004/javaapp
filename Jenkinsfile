@@ -10,7 +10,7 @@ pipeline {
         // Stage 1: Pull code from Git
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Chaitan2004/javaapp' 
+                git branch: 'main', url: 'https://github.com/Chaitan2004/javaapp'
             }
         }
 
@@ -21,11 +21,13 @@ pipeline {
             }
         }
 
-        // Stage 3: Run SonarQube analysis (Fixed for Windows)
+        // Stage 3: Run SonarQube analysis (Using password as token)
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat '"C:\\apache-maven-3.9.9\\bin\\mvn" sonar:sonar'
+                    withCredentials([usernamePassword(credentialsId: 'sonarqube-cred', usernameVariable: 'SONAR_USER', passwordVariable: 'SONAR_TOKEN')]) {
+                        bat '"C:\\apache-maven-3.9.9\\bin\\mvn" sonar:sonar -Dsonar.login=%SONAR_TOKEN%'
+                    }
                 }
             }
         }
@@ -37,13 +39,15 @@ pipeline {
             }
         }
 
-        // Stage 5: Push Docker image to Docker Hub
+        // Stage 5: Push Docker image to Docker Hub with Jenkins credentials
         stage('Docker Push') {
             steps {
-                bat """
-                docker login -u YOUR_DOCKER_USERNAME -p YOUR_DOCKER_PASSWORD
-                docker push ${DOCKER_IMAGE}
-                """
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat """
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    docker push ${DOCKER_IMAGE}
+                    """
+                }
             }
         }
 
