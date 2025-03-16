@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "2022bcd0038-chaitan/javaapp" 
+        DOCKER_IMAGE = "chaitan2004/2022bcd0038-chaitan-javaapp" 
         DOCKER_REGISTRY = "docker.io" // Docker registry (Docker Hub)
     }
 
