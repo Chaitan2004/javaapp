@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        // Stage 2: Build the project using Maven (Fixed for Windows)
+        // Stage 2: Build the project using Maven 
         stage('Build') {
             steps {
                 bat '"C:\\apache-maven-3.9.9\\bin\\mvn" clean package'
