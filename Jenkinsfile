@@ -10,22 +10,22 @@ pipeline {
         // Stage 1: Pull code from Git
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Chaitan2004/javaapp'
+                git branch: 'main', url: 'https://github.com/Chaitan2004/javaapp' 
             }
         }
 
-        // Stage 2: Build the project using Maven (Windows-friendly)
+        // Stage 2: Build the project using Maven (Fixed for Windows)
         stage('Build') {
             steps {
-                bat 'mvn clean package'
+                bat '"C:\\apache-maven-3.9.9\\bin\\mvn" clean package'
             }
         }
 
-        // Stage 3: Run SonarQube analysis (Windows-friendly)
+        // Stage 3: Run SonarQube analysis (Fixed for Windows)
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat 'mvn sonar:sonar'
+                    bat '"C:\\apache-maven-3.9.9\\bin\\mvn" sonar:sonar'
                 }
             }
         }
@@ -33,20 +33,17 @@ pipeline {
         // Stage 4: Build Docker image
         stage('Docker Build') {
             steps {
-                script {
-                    bat "docker build -t ${DOCKER_IMAGE} ."
-                }
+                bat "docker build -t ${DOCKER_IMAGE} ."
             }
         }
 
         // Stage 5: Push Docker image to Docker Hub
         stage('Docker Push') {
             steps {
-                script {
-                    withDockerRegistry([credentialsId: 'dockerhub-credentials', url: "https://${DOCKER_REGISTRY}"]) {
-                        bat "docker push ${DOCKER_IMAGE}"
-                    }
-                }
+                bat """
+                docker login -u YOUR_DOCKER_USERNAME -p YOUR_DOCKER_PASSWORD
+                docker push ${DOCKER_IMAGE}
+                """
             }
         }
 
