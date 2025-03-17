@@ -1,7 +1,6 @@
 package com.example;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,8 +17,9 @@ public class AppTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void testApp() {
-        String response = this.restTemplate.getForObject("http://localhost:" + port + "/hello", String.class);
-        assertEquals("Hello, World!", response);
+    public void testHelloEndpoint() {
+        String url = "http://localhost:" + port + "/hello";
+        String response = this.restTemplate.getForObject(url, String.class);
+        assertThat(response).isEqualTo("Hello, World!");
     }
 }

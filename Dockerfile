@@ -1,21 +1,13 @@
-# 🛠 Build Stage
-FROM maven:3.8.6-openjdk-11 AS build
+# Stage 1: Build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-COPY src ./src
+COPY . .
 RUN mvn clean package -DskipTests
 
-# 🚀 Production Stage
-FROM openjdk:11-jre-slim
+# Stage 2: Run
+FROM eclipse-temurin:21-jre
 WORKDIR /app
+COPY --from=build /app/target/javaapp-1.0.0.jar ./app.jar
 
-# Copy built JAR from the build stage
-COPY --from=build /app/target/javaapp-1.0-SNAPSHOT.jar ./javaapp.jar
-
-# Expose port for web service
 EXPOSE 8080
-
-# Start the Java application
-CMD ["java", "-jar", "javaapp.jar"]
+CMD ["java", "-jar", "app.jar"]
